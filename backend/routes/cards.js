@@ -3,7 +3,7 @@ const express = require("express");
 const {
   getCards,
   createCards,
-  deleteCards,
+  deleteCard,
   likeCard,
   deleteLike,
 } = require("../controllers/cards");
@@ -14,7 +14,7 @@ router.get("/", getCards);
 
 router.post("/", createCards);
 
-router.delete("/:id", deleteCards);
+router.delete("/:id", deleteCard);
 
 router.put("/:cardId/likes", likeCard);
 

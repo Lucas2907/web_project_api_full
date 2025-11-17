@@ -1,5 +1,7 @@
-/* eslint-disable operator-linebreak */
-/* eslint-disable comma-dangle */
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 const User = require("../models/users");
 
 module.exports.getUsers = (req, res) => {
@@ -21,7 +23,7 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUserById = (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params.id;
   User.findById(id)
     .orFail(() => {
       const error = new Error("Nenhum usuário com esse Id");
@@ -45,9 +47,15 @@ module.exports.getUserById = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-
-  User.create({ name, about, avatar })
+  const { email, password } = req.body;
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => {
+      User.create({
+        email,
+        password: hash,
+      });
+    })
     .then((user) => {
       res.status(201).send(user);
     })
@@ -117,4 +125,34 @@ module.exports.updateAvatar = (req, res) => {
           : "Erro desconhecido do servidor";
       return res.status(status).send({ message });
     });
+};
+
+module.exports.login = (req, res) => {
+  const { password, email } = req.body;
+  return User.findUserByCredential(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
+        {
+          expiresIn: "7d",
+        }
+      );
+      res.send({ token });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
+
+module.exports.getCurrentUser = (req, res, next) => {
+  const userId = req.user;
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error(), "Usuário não encontrado");
+      }
+      return res.send({ data: user });
+    })
+    .catch((err) => res.send({ message: err.message }));
 };

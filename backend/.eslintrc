@@ -1,5 +1,6 @@
 {
-  "extends": "airbnb-base",
+  "extends": ["airbnb-base", "preetier"],
+
   "env": {
     "node": true,
     "es2021": true

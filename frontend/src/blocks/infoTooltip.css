@@ -1,0 +1,107 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.3s, opacity 0.3s;
+}
+
+.modal_opened {
+  visibility: visible;
+  opacity: 1;
+}
+
+.modal__container {
+  box-sizing: border-box;
+  background-color: white;
+  border-radius: 10px;
+  padding: 36px;
+  position: relative;
+  max-width: 430px;
+  height: 330px;
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+
+.modal__close {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 40px;
+  height: 40px;
+  background: transparent url("../assets/images/plussign.svg") center no-repeat;
+  background-size: contain;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  transform: rotate(45deg);
+}
+
+.modal__close:hover {
+  opacity: 0.6;
+}
+
+.modal__icon {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 32px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.modal__icon_success {
+  background-image: url("../assets/images/sucess.svg");
+}
+
+.modal__icon_error {
+  background-image: url("../assets/images/denied.svg");
+}
+
+.modal__message {
+  font-family: "Inter", Arial, sans-serif;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 29px;
+  text-align: center;
+  color: #000000;
+  margin: 0;
+}
+
+@media screen and (max-width: 627px) {
+  .modal__container {
+    max-width: 282px;
+    padding: 28px 22px;
+  }
+
+  .modal__close {
+    top: -36px;
+    right: 0;
+    width: 26px;
+    height: 26px;
+  }
+
+  .modal__icon {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 24px;
+  }
+
+  .modal__message {
+    font-size: 20px;
+    line-height: 24px;
+  }
+}

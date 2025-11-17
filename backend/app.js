@@ -1,5 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
+
+require("dotenv").config();
+
+const auth = require("./middlewares/auth");
 
 const app = express();
 
@@ -12,20 +17,19 @@ const { PORT = 3000 } = process.env;
 
 const userRoutes = require("./routes/users");
 const cardRoutes = require("./routes/cards");
+const { login, createUser } = require("./controllers/user");
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: "68a450f8f27c95eb3afe0dce",
-  };
+app.use(cors());
 
-  next();
-});
+app.post("/signin", login);
 
-app.use("/cards", cardRoutes);
+app.post("/signup", createUser);
 
-app.use("/users", userRoutes);
+app.use("/cards", auth, cardRoutes);
+
+app.use("/users", auth, userRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Endereço não encontrado" });

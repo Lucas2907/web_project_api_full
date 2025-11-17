@@ -1,0 +1,30 @@
+.password__container {
+  display: flex;
+  justify-content: initial;
+}
+
+.password__table {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.icon {
+  transition: all 0.3s ease-in-out;
+}
+
+.check__icon {
+  background-color: rgba(0, 255, 0, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 6px 2px rgba(0, 255, 0, 0.9);
+  width: 8px;
+  height: 8px;
+}
+
+.wrong__icon {
+  background-color: red;
+  border-radius: 50%;
+  box-shadow: 0 0 6px 2px red;
+  width: 8px;
+  height: 8px;
+}

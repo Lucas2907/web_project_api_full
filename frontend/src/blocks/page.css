@@ -1,0 +1,22 @@
+.page {
+  font-family: "Inter", sans-serif;
+  display: flex;
+  flex-direction: column;
+  background-color: black;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 45px 200px 60px 200px;
+}
+
+@media screen and (min-width: 768px) and (max-width: 1279px) {
+  .page {
+    padding: 45px 50px 60px;
+  }
+}
+
+@media screen and (min-width: 320px) and (max-width: 767px) {
+  .page {
+    padding: 28px 0 36px;
+  }
+}

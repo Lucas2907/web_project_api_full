@@ -38,27 +38,19 @@ module.exports.createCards = (req, res) => {
     });
 };
 
-module.exports.deleteCards = (req, res) => {
+module.exports.deleteCard = (req, res) => {
   const { id } = req.params;
-  Card.findByIdAndDelete(id)
-    .orFail(() => {
-      const error = new Error("Nenhum Cartão encontrado");
-      error.statusCode = 404;
-      throw error;
-    })
-    .then(() => {
-      res.status(204).send({ message: "Card deletado com sucesso" });
-    })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(400).send({ message: "ID inválido" });
-      }
-
-      const status = err.statusCode || 500;
-      const message =
-        status === 404 ? "Nenhum card foi encontrado " : "Erro no servidor";
-      return res.status(status).send({ message, err });
-    });
+  Card.findById(id).then((card) => {
+    if (!card) {
+      return res.send({ message: "Card não existe" });
+    }
+    if (card.owner.toString() !== req.user._id) {
+      return res.send({ message: "você nao tem autorização" });
+    }
+    return Card.findByIdAndDelete(id)
+      .then(() => res.send({ message: "Card deletado com sucesso!" }))
+      .catch((err) => res.send({ message: err.message }));
+  });
 };
 
 module.exports.likeCard = (req, res) => {
