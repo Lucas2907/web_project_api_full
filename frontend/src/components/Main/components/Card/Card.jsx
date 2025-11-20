@@ -1,10 +1,13 @@
 import trashIcon from "../../../../assets/images/Trash.svg";
 import hearthIcon from "../../../../assets/images/hearth.svg";
 import Union from "../../../../assets/images/Union.svg";
+import CurrentUserContext from "../../../../contexts/CurrentUserContext";
+import { useContext } from "react";
 
 export default function Card(props) {
-  const { name, link, isLiked } = props.card;
-
+  const { currentUser } = useContext(CurrentUserContext);
+  const { name, link, likes } = props.card;
+  const isLiked = likes.some((ownerId) => ownerId === currentUser.id);
   function handleLikeClick(card) {
     props.onCardLike(card);
   }

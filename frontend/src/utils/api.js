@@ -4,21 +4,20 @@ class Api {
     this._headers = headers;
   }
 
+  setAuthorization(token) {
+    this._headers.authorization = `Bearer ${token}`;
+  }
+
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, {
-      headers: {
-        authorization: this._headers,
-      },
+      headers: this._headers,
     });
   }
 
   setUserInfo({ name, about }) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
-      headers: {
-        authorization: this._headers,
-        "Content-Type": "application/json",
-      },
+      headers: this._headers,
       body: JSON.stringify({
         name,
         about,
@@ -28,19 +27,14 @@ class Api {
 
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
-      headers: {
-        authorization: this._headers,
-      },
+      headers: this._headers,
     });
   }
 
   createCard(newCard) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
-      headers: {
-        authorization: this._headers,
-        "Content-Type": "application/json",
-      },
+      headers: this._headers,
       body: JSON.stringify(newCard),
     });
   }
@@ -48,36 +42,27 @@ class Api {
   updateLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "PUT",
-      headers: {
-        authorization: this._headers,
-      },
+      headers: this._headers,
     });
   }
   removeLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "DELETE",
-      headers: {
-        authorization: this._headers,
-      },
+      headers: this._headers,
     });
   }
 
   deleteCard(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: "DELETE",
-      headers: {
-        authorization: this._headers,
-      },
+      headers: this._headers,
     });
   }
 
   changeProfileImage({ avatar }) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
-      headers: {
-        authorization: this._headers,
-        "Content-Type": "application/json",
-      },
+      headers: this._headers,
       body: JSON.stringify({
         avatar,
       }),
@@ -85,9 +70,8 @@ class Api {
   }
 }
 
-const api = new Api(
-  "http://localhost:3001",
-  "a016777f-b4ef-40ad-b50c-29e69831ab99"
-);
+const api = new Api(import.meta.env.VITE_BASE_URL, {
+  "Content-Type": "application/json",
+});
 
 export default api;

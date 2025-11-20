@@ -9,7 +9,7 @@ import Login from "./Login/Login";
 import Register from "./Register/Register";
 import ProtectedRoute from "./ProtectedRoute/ProtectedRoute";
 import InfoTooltip from "./InfoTooltip/InfoTooltip";
-import { register, authorize, checkToken } from "../utils/auth";
+import { register, authorize } from "../utils/auth";
 
 function App() {
   const [currentUser, setCurrentUser] = useState({});
@@ -24,17 +24,15 @@ function App() {
   const [tooltipMessage, setTooltipMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const [token, setToken] = useState();
-
   const navigate = useNavigate();
 
   const handleLogin = (userData) => {
     authorize(userData.email, userData.password)
       .then((data) => {
         if (data.token) {
-          localStorage.setItem("token", data.token);
-          setToken(data.token);
-          console.log(token);
+          localStorage.setItem("jwt", data.token);
+          localStorage.setItem("email", userData.email);
+          api.setAuthorization(data.token);
           setLoggedIn(true);
           setUserEmail(userData.email);
           navigate("/");
@@ -74,9 +72,10 @@ function App() {
   };
 
   const handleSignOut = () => {
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("email");
     setLoggedIn(false);
     setUserEmail("");
-    localStorage.remove("jwt");
   };
 
   const closeInfoTooltip = () => {
@@ -85,40 +84,36 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("jwt");
+    const email = localStorage.getItem("email");
     if (token) {
-      checkToken(token)
-        .then((userData) => {
-          setToken(token);
-          setLoggedIn(true);
-          navigate("/");
-          setUserEmail(userData.data.email);
-        })
-        .catch((error) => {
-          localStorage.removeItem("jwt");
-          setToken("");
-          setLoggedIn(false);
-          console.log("Token Inválido", error);
-        });
+      setLoggedIn(true);
+      navigate("/");
+      api.setAuthorization(token);
+      setUserEmail(email);
     }
   }, [navigate]);
 
   //pega info user atual
   useEffect(() => {
-    api
-      .getUserInfo()
-      .then((response) => {
-        return !response.ok
-          ? Promise.reject("Deu erro no get info user")
-          : response.json();
-      })
-      .then((data) => {
-        setCurrentUser(data);
-      })
+    if (loggedIn) {
+      api
+        .getUserInfo()
+        .then((response) => {
+          console.log(response);
+          return !response.ok
+            ? Promise.reject("Deu erro no get info user")
+            : response.json();
+        })
+        .then((data) => {
+          console.log(`aqui esta a data: ${data.data}`);
+          setCurrentUser(data.data);
+        })
 
-      .catch((error) => {
-        console.log(`[GET]- /user-me ${error}`);
-      });
-  }, []);
+        .catch((error) => {
+          console.log(`[GET]- /user-me ${error}`);
+        });
+    }
+  }, [loggedIn]);
 
   // atualiza info user
   const handleUpdateUser = (data) => {
@@ -127,8 +122,8 @@ function App() {
         .setUserInfo(data)
         .then(() => {
           setCurrentUser({
-            name: data.name,
-            about: data.about,
+            name: data.data.name,
+            about: data.data.about,
             avatar: currentUser.avatar,
             _id: currentUser._id,
           });
@@ -140,20 +135,22 @@ function App() {
 
   //recebe cards inicias
   useEffect(() => {
-    api
-      .getInitialCards()
-      .then((response) => {
-        return !response.ok
-          ? Promise.reject("Deu erro no Get Cards")
-          : response.json();
-      })
-      .then((data) => {
-        setCards(data.data);
-      })
-      .catch((error) => {
-        console.log(`[GET] - /cards - ${error}`);
-      });
-  }, []);
+    if (loggedIn) {
+      api
+        .getInitialCards()
+        .then((response) => {
+          return !response.ok
+            ? Promise.reject("Deu erro no Get Cards")
+            : response.json();
+        })
+        .then((data) => {
+          setCards(data.data);
+        })
+        .catch((error) => {
+          console.log(`[GET] - /cards - ${error}`);
+        });
+    }
+  }, [loggedIn]);
 
   async function handleCardLike(card) {
     const isLiked = card.isLiked;
@@ -214,7 +211,7 @@ function App() {
         .createCard(newCard)
         .then((response) => response.json())
         .then((card) => {
-          setCards([card, ...cards]);
+          setCards([card.data, ...cards]);
           handleClosePopup();
         })
         .catch((error) => console.error(error));
@@ -259,7 +256,7 @@ function App() {
               >
                 <Header
                   userEmail={userEmail}
-                  path={"/signin"}
+                  path={""}
                   onSignout={handleSignOut}
                   children={"Sair"}
                 />
@@ -296,3 +293,5 @@ function App() {
 }
 
 export default App;
+
+//

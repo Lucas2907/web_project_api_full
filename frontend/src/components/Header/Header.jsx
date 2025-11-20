@@ -7,9 +7,15 @@ export default function Header({ children, path, userEmail, onSignout }) {
         <img src={logo} alt="imagem da logo" className="header__logo" />
         <div className="header__info">
           {userEmail}
-          <Link to={path} className="auth__link" onClick={onSignout}>
-            {children}
-          </Link>
+          {path === "/signin" || path === "/signup" ? (
+            <Link to={path} className="auth__link">
+              {children}
+            </Link>
+          ) : (
+            <p className="auth__link" onClick={onSignout}>
+              {children}
+            </p>
+          )}
         </div>
       </div>
       <hr className="header__line" />
