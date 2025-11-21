@@ -1,5 +1,3 @@
-/* eslint-disable comma-dangle */
-/* eslint-disable operator-linebreak */
 const Card = require("../models/cards");
 
 module.exports.getCards = (req, res) => {
@@ -60,8 +58,8 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: userId } },
     { new: true }
   )
-    .then(() => {
-      res.status(200).send({ message: "Card curtido com sucesso" });
+    .then((card) => {
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === "CastError") {
@@ -78,8 +76,8 @@ module.exports.deleteLike = (req, res) => {
     { $pull: { likes: userId } },
     { new: true }
   )
-    .then(() => {
-      res.status(200).send({ message: "Like deletado com sucesso" });
+    .then((card) => {
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === "CastError") {

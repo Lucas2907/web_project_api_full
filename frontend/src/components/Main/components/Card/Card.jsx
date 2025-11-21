@@ -7,7 +7,7 @@ import { useContext } from "react";
 export default function Card(props) {
   const { currentUser } = useContext(CurrentUserContext);
   const { name, link, likes } = props.card;
-  const isLiked = likes.some((ownerId) => ownerId === currentUser.id);
+  const isLiked = likes.some((ownerId) => ownerId === currentUser._id);
   function handleLikeClick(card) {
     props.onCardLike(card);
   }

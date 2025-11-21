@@ -98,17 +98,9 @@ function App() {
     if (loggedIn) {
       api
         .getUserInfo()
-        .then((response) => {
-          console.log(response);
-          return !response.ok
-            ? Promise.reject("Deu erro no get info user")
-            : response.json();
-        })
         .then((data) => {
-          console.log(`aqui esta a data: ${data.data}`);
-          setCurrentUser(data.data);
+          setCurrentUser(data);
         })
-
         .catch((error) => {
           console.log(`[GET]- /user-me ${error}`);
         });
@@ -122,8 +114,8 @@ function App() {
         .setUserInfo(data)
         .then(() => {
           setCurrentUser({
-            name: data.data.name,
-            about: data.data.about,
+            name: data.name,
+            about: data.about,
             avatar: currentUser.avatar,
             _id: currentUser._id,
           });
@@ -138,13 +130,8 @@ function App() {
     if (loggedIn) {
       api
         .getInitialCards()
-        .then((response) => {
-          return !response.ok
-            ? Promise.reject("Deu erro no Get Cards")
-            : response.json();
-        })
         .then((data) => {
-          setCards(data.data);
+          setCards(data);
         })
         .catch((error) => {
           console.log(`[GET] - /cards - ${error}`);
@@ -153,11 +140,10 @@ function App() {
   }, [loggedIn]);
 
   async function handleCardLike(card) {
-    const isLiked = card.isLiked;
+    const isLiked = card.likes.some((ownerId) => ownerId === currentUser._id);
     isLiked
       ? await api
           .removeLike(card._id)
-          .then((res) => res.json())
           .then((newCard) => {
             setCards((state) => {
               return state.map((currentCard) =>
@@ -165,10 +151,9 @@ function App() {
               );
             });
           })
-          .catch((error) => console.error(error))
+          .catch((error) => console.error(`deu erro no remove ${error}`))
       : await api
           .updateLike(card._id)
-          .then((res) => res.json())
           .then((newCard) => {
             setCards((state) => {
               return state.map((currentCard) =>
@@ -182,7 +167,6 @@ function App() {
   async function handleCardDelete(card) {
     await api
       .deleteCard(card._id)
-      .then((response) => response.json())
       .then(
         setCards(cards.filter((cardDeleted) => cardDeleted._id !== card._id))
       )
@@ -209,9 +193,8 @@ function App() {
     (async () => {
       await api
         .createCard(newCard)
-        .then((response) => response.json())
         .then((card) => {
-          setCards([card.data, ...cards]);
+          setCards([card, ...cards]);
           handleClosePopup();
         })
         .catch((error) => console.error(error));
@@ -294,4 +277,4 @@ function App() {
 
 export default App;
 
-//
+//por algum motivo apos criar o metodo privado no API e aplicar na requisição updatelike e removelike, ele simplesmente diz que _id nao existe, antes de adicionar metodo privado ele funcionava

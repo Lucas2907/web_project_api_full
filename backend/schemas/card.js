@@ -1,4 +1,3 @@
-/* eslint-disable comma-dangle */
 const mongoose = require("mongoose");
 
 const cardSchema = new mongoose.Schema({

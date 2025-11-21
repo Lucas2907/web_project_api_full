@@ -110,16 +110,18 @@ export default function Main({
       </section>
       <ul className="photos">
         {cards &&
-          cards.map((card) => (
-            <Card
-              key={card._id}
-              card={card}
-              onCardClick={handleCardClick}
-              onCardLike={onCardLike}
-              onOpenPopupConfirmation={onOpenPopupConfirmation}
-              onCardDelete={onCardDelete}
-            />
-          ))}
+          cards.map((card) => {
+            return (
+              <Card
+                key={card._id}
+                card={card}
+                onCardClick={handleCardClick}
+                onCardLike={onCardLike}
+                onOpenPopupConfirmation={onOpenPopupConfirmation}
+                onCardDelete={onCardDelete}
+              />
+            );
+          })}
       </ul>
       {popup && (
         <Popup onClose={onClosePopup} title={popup.title}>
