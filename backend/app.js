@@ -1,9 +1,17 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
 require("dotenv").config();
 
+const {
+  validateCreateUser,
+  validateLogin,
+  validateCreateCard,
+  validateCardId,
+  validateUserId,
+  validateUpdateProfile,
+  validateUpdateAvatar,
+} = require("./middlewares/validation");
 const auth = require("./middlewares/auth");
 
 const app = express();
@@ -23,9 +31,9 @@ app.use(express.json());
 
 app.use(cors());
 
-app.post("/signin", login);
+app.post("/signin", validateLogin, login);
 
-app.post("/signup", createUser);
+app.post("/signup", validateCreateUser, createUser);
 
 app.use("/cards", auth, cardRoutes);
 

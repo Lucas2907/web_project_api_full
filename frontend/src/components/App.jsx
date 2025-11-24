@@ -56,13 +56,15 @@ function App() {
 
   const handleRegister = (userData) => {
     register(userData.email, userData.password)
-      .then(() => {
+      .then((data) => {
+        console.log(data);
         setIsSuccess(true);
         setTooltipMessage("Cadastro realizado com sucesso!");
         setIsInfoTooltipOpen(true);
         navigate("/signin");
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         setIsSuccess(false);
         setTooltipMessage(
           `Email fornecido ja cadastrado, faça login para aceder a plataforma!`
