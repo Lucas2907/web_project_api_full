@@ -1,58 +1,49 @@
+const UnathorizedError = require("../errors/unathorized-err");
+const NotFoundError = require("../errors/not-found-err");
 const Card = require("../models/cards");
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .orFail(() => {
-      const error = new Error("Nenhum Card Encontrado");
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError("Nenhum Card encontrado");
     })
     .then((card) => {
       res.send({ data: card });
     })
-    .catch((err) => {
-      const status = err.statusCode || 500;
-      const message =
-        status === 404 ? "Nenhum Card Encontrado" : "Erro do Servidor";
-      return res.status(status).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.createCards = (req, res) => {
+module.exports.createCards = (req, res, next) => {
   const { name, link, owner = req.user._id } = req.body;
   Card.create({ name, link, owner })
     .then((card) => {
       res.status(201).send({ data: card });
     })
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(400).send({
-          message: "A sua requisição não corresponde aos padrões estabelecidos",
-        });
-      }
-      return res
-        .status(500)
-        .send({ message: "Erro Desconhecido encontrado", err });
-    });
+    .catch(next);
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   const { id } = req.params;
-  Card.findById(id).then((card) => {
-    if (!card) {
-      return res.send({ message: "Card não existe" });
-    }
-    if (card.owner.toString() !== req.user._id) {
-      return res.send({ message: "você nao tem autorização" });
-    }
-    return Card.findByIdAndDelete(id)
-      .then(() => res.send({ message: "Card deletado com sucesso!" }))
-      .catch((err) => res.send({ message: err.message }));
-  });
+  Card.findById(id)
+    .then(async (card) => {
+      if (!card) {
+        throw new NotFoundError("Card não existe");
+      }
+      if (card.owner.toString() !== req.user._id) {
+        throw new UnathorizedError(
+          "Autorização necessária para concluir processo solicitado"
+        );
+      }
+      await Card.findByIdAndDelete(id).then(() => {
+        return res.send({ message: "Card deletado com sucesso!" });
+      });
+    })
+    .catch(next);
 };
 
 module.exports.likeCard = (req, res) => {
   const userId = req.user._id;
+
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: userId } },
@@ -61,12 +52,7 @@ module.exports.likeCard = (req, res) => {
     .then((card) => {
       res.send(card);
     })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(400).send({ message: "ID inválido" });
-      }
-      return res.status(500).send({ message: "Erro interno do servidor" });
-    });
+    .catch(next);
 };
 
 module.exports.deleteLike = (req, res) => {
@@ -79,10 +65,5 @@ module.exports.deleteLike = (req, res) => {
     .then((card) => {
       res.send(card);
     })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(400).send({ message: "ID inválido" });
-      }
-      return res.status(500).send({ message: "Erro interno do servidor" });
-    });
+    .catch(next);
 };

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const NotFoundError = require("../errors/not-found-err");
-const Forbidden = require("../errors/forbidden");
+const UnathorizedError = require("../errors/unathorized-err");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -59,7 +59,7 @@ userSchema.statics.findUserByCredential = function findUserByCredential(
       }
       const matched = await bcrypt.compare(password, user.password);
       if (!matched) {
-        throw new Forbidden("E-mail ou senha incorretos");
+        throw new UnathorizedError("E-mail ou senha incorretos");
       }
       return user;
     });
