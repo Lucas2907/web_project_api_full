@@ -3,55 +3,25 @@ const jwt = require("jsonwebtoken");
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 const User = require("../models/users");
+const NotFoundError = require("../errors/not-found-err");
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .orFail(() => {
-      const error = new Error("Nenhum usuário encontrado");
-      error.statusCode = 404;
-      throw error;
-    })
-    .then((users) => {
-      res.send({ data: users });
-    })
-    .catch((err) => {
-      const status = err.statusCode || 500;
-      const message =
-        status === 404 ? "Nenhum usuário encontrado" : "Erro do servidor";
-      return res.status(status).send({ message });
-    });
-};
-
-module.exports.getUserById = (req, res) => {
-  const { id } = req.params.id;
-  User.findById(id)
-    .orFail(() => {
-      const error = new Error("Nenhum usuário com esse Id");
-      error.statusCode = 404;
-      throw error;
-    })
     .then((user) => {
-      res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(400).send({ message: "ID inválido" });
+      if (user.length === 0) {
+        throw new NotFoundError("Nenhum usuário encontrado");
       }
-      const status = err.statusCode || 500;
-      const message =
-        status === 404
-          ? "Nenhum usuário foi encontrado com esse id"
-          : "Erro no servidor";
-      return res.status(status).send({ message });
-    });
+      res.send(user);
+    })
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const { email, password } = req.body;
   bcrypt
     .hash(password, 10)
     .then((hash) => {
-      User.create({
+      return User.create({
         email,
         password: hash,
       });
@@ -59,17 +29,10 @@ module.exports.createUser = (req, res) => {
     .then((user) => {
       res.status(201).send(user);
     })
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(400).send({
-          message: "A sua requisição não corresponde aos padrões estabelecidos",
-        });
-      }
-      return res.status(500).send({ message: "Erro interno do servidor", err });
-    });
+    .catch(next);
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.updateProfile = (req, res, next) => {
   const userId = req.user._id;
   const { name, about } = req.body;
   User.findByIdAndUpdate(
@@ -77,57 +40,29 @@ module.exports.updateProfile = (req, res) => {
     { name, about },
     { new: true, runValidators: true }
   )
-    .orFail(() => {
-      const error = new Error("Erro ao atualizar Perfil");
-      error.statusCode = 404;
-      throw error;
-    })
-    .then(() => {
-      res.status(200).send({ message: "Perfil atualizado com sucesso" });
-    })
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(400).send({
-          message: "A sua requisição não corresponde aos padrões estabelecidos",
-        });
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError("Erro ao encontrar perfil solicitado");
       }
-      const status = err.statusCode || 500;
-      const message =
-        status === 404
-          ? "Usuário não encontrado"
-          : "Erro desconhecido do servidor";
-      return res.status(status).send({ message });
-    });
+      return res.status(200).send({ message: "Perfil atualizado com sucesso" });
+    })
+    .catch(next);
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const userId = req.user._id;
   const { avatar } = req.body;
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
-    .orFail(() => {
-      const error = new Error("Erro ao atualizar avatar");
-      error.statusCode = 404;
-      throw error;
-    })
-    .then(() => {
-      res.status(200).send({ message: "Avatar alterado com sucesso" });
-    })
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(400).send({
-          message: "A sua requisição não corresponde aos padrões estabelecidos",
-        });
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError("Erro ao encontrar avatar solicitado");
       }
-      const status = err.statusCode || 500;
-      const message =
-        status === 404
-          ? "Usuário não encontrado"
-          : "Erro desconhecido do servidor";
-      return res.status(status).send({ message });
-    });
+      return res.status(200).send({ message: "Avatar alterado com sucesso" });
+    })
+    .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { password, email } = req.body;
   return User.findUserByCredential(email, password)
     .then((user) => {
@@ -138,21 +73,19 @@ module.exports.login = (req, res) => {
           expiresIn: "7d",
         }
       );
-      res.send({ token });
+      return res.send({ token });
     })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
-    });
+    .catch(next);
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
-  const userId = req.user;
+  const userId = req.user._id;
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error(), "Usuário não encontrado");
+        throw new NotFoundError("Usuário não encontrado");
       }
       return res.send({ data: user });
     })
-    .catch((err) => res.send({ message: err.message }));
+    .catch(next);
 };

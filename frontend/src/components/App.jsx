@@ -39,7 +39,6 @@ function App() {
         }
       })
       .catch((error) => {
-        console.log("Erro no login:", error);
         let message;
         if (error === 400) {
           message = "Um ou mais campos não foram fornecidos";
@@ -56,15 +55,14 @@ function App() {
 
   const handleRegister = (userData) => {
     register(userData.email, userData.password)
-      .then((data) => {
-        console.log(data);
+      .then(() => {
         setIsSuccess(true);
         setTooltipMessage("Cadastro realizado com sucesso!");
         setIsInfoTooltipOpen(true);
         navigate("/signin");
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
+        
         setIsSuccess(false);
         setTooltipMessage(
           `Email fornecido ja cadastrado, faça login para aceder a plataforma!`

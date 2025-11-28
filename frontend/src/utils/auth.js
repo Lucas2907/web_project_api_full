@@ -9,7 +9,7 @@ export const register = (email, password) => {
     body: JSON.stringify({ email, password }),
   }).then((response) => {
     if (response.ok) {
-      return response;
+      return response.json();
     }
     return Promise.reject(response.status);
   });
@@ -36,7 +36,6 @@ export const authorize = (email, password) => {
       }
     })
     .catch((err) => {
-      console.log(err);
       throw err;
     });
 };

@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
+const NotFoundError = require("../errors/not-found-err");
+const Forbidden = require("../errors/forbidden");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -51,16 +53,15 @@ userSchema.statics.findUserByCredential = function findUserByCredential(
 ) {
   return this.findOne({ email })
     .select("+password")
-    .then((user) => {
+    .then(async (user) => {
       if (!user) {
-        return Promise.reject(new Error("E-mail ou senha incorretos"));
+        throw new NotFoundError("E-mail ou senha incorretos");
       }
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
-          return Promise.reject(new Error("E-mail ou senha incorretos"));
-        }
-        return user;
-      });
+      const matched = await bcrypt.compare(password, user.password);
+      if (!matched) {
+        throw new Forbidden("E-mail ou senha incorretos");
+      }
+      return user;
     });
 };
 

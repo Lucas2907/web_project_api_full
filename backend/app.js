@@ -2,7 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
-
+const { errors } = require("celebrate");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 const {
   validateCreateUser,
   validateLogin,
@@ -31,6 +32,8 @@ app.use(express.json());
 
 app.use(cors());
 
+app.use(requestLogger);
+
 app.post("/signin", validateLogin, login);
 
 app.post("/signup", validateCreateUser, createUser);
@@ -39,8 +42,14 @@ app.use("/cards", auth, cardRoutes);
 
 app.use("/users", auth, userRoutes);
 
-app.use((req, res) => {
-  res.status(404).json({ message: "Endereço não encontrado" });
+app.use(errors());
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode);
+  res.send({
+    message: statusCode === 500 ? "Ocorreu um erro no servidor" : message,
+  });
 });
 
 app.listen(PORT, () => {
