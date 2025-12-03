@@ -10,6 +10,7 @@ const {
 const {
   validateCreateCard,
   validateCardId,
+  validateId,
 } = require("../middlewares/validation");
 
 const router = express.Router();
@@ -18,7 +19,7 @@ router.get("/", getCards);
 
 router.post("/", validateCreateCard, createCards);
 
-router.delete("/:id", validateCardId, deleteCard);
+router.delete("/:id", validateId, deleteCard);
 
 router.put("/:cardId/likes", validateCardId, likeCard);
 

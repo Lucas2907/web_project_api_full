@@ -32,9 +32,15 @@ const validateCreateCard = celebrate({
   }),
 });
 
-const validateCardId = celebrate({
+const validateId = celebrate({
   params: Joi.object().keys({
     id: Joi.string().hex().length(24),
+  }),
+});
+
+const validateCardId = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().hex().length(24),
   }),
 });
 
@@ -65,4 +71,5 @@ module.exports = {
   validateUserId,
   validateUpdateProfile,
   validateUpdateAvatar,
+  validateId,
 };
