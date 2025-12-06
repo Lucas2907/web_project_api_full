@@ -276,5 +276,3 @@ function App() {
 }
 
 export default App;
-
-//por algum motivo apos criar o metodo privado no API e aplicar na requisição updatelike e removelike, ele simplesmente diz que _id nao existe, antes de adicionar metodo privado ele funcionava
