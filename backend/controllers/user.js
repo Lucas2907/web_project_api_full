@@ -7,11 +7,11 @@ const NotFoundError = require("../errors/not-found-err");
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
+    .orFail(() => {
+      throw new NotFoundError("Nenhum Usuário encontrado");
+    })
     .then((user) => {
-      if (user.length === 0) {
-        throw new NotFoundError("Nenhum usuário encontrado");
-      }
-      res.send(user);
+      res.send({ data: user });
     })
     .catch(next);
 };
