@@ -62,7 +62,6 @@ function App() {
         navigate("/signin");
       })
       .catch(() => {
-        
         setIsSuccess(false);
         setTooltipMessage(
           `Email fornecido ja cadastrado, faça login para aceder a plataforma!`

@@ -17,7 +17,7 @@ module.exports.createCards = (req, res, next) => {
   const { name, link, owner = req.user._id } = req.body;
   Card.create({ name, link, owner })
     .then((card) => {
-      res.status(201).send({ data: card });
+      res.status(201).send(card);
     })
     .catch(next);
 };
@@ -43,36 +43,26 @@ module.exports.deleteCard = (req, res, next) => {
 
 module.exports.likeCard = (req, res, next) => {
   const userId = req.user._id;
-  Card.findById(req.params.cardId)
-    .then(async (card) => {
-      if (!card) {
-        throw new NotFoundError("CardId não encontrado");
-      }
-      await Card.findByIdAndUpdate(
-        req.params.cardId,
-        { $addToSet: { likes: userId } },
-        { new: true }
-      ).then((card) => {
-        res.send(card);
-      });
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: userId } },
+    { new: true }
+  )
+    .then((card) => {
+      res.send(card);
     })
     .catch(next);
 };
 
 module.exports.deleteLike = (req, res, next) => {
   const userId = req.user._id;
-  Card.findById(req.params.cardId)
-    .then(async (card) => {
-      if (!card) {
-        throw new NotFoundError("CardId não encontrado");
-      }
-      await Card.findByIdAndUpdate(
-        req.params.cardId,
-        { $addToSet: { likes: userId } },
-        { new: true }
-      ).then((card) => {
-        res.send(card);
-      });
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: userId } },
+    { new: true }
+  )
+    .then((card) => {
+      res.send(card);
     })
     .catch(next);
 };
