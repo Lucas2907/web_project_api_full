@@ -78,7 +78,6 @@ module.exports.login = (req, res, next) => {
     .catch(next);
 };
 
-//^^token sendo enviado para a requisição o que causa na leitura do token do usuario, tentar enviar por cookie
 
 module.exports.getCurrentUser = (req, res, next) => {
   const userId = req.user._id;

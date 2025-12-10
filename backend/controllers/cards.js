@@ -52,8 +52,8 @@ module.exports.likeCard = (req, res, next) => {
         req.params.cardId,
         { $addToSet: { likes: userId } },
         { new: true }
-      ).then(() => {
-        res.send({ message: "Card curtido com sucesso" });
+      ).then((card) => {
+        res.send(card);
       });
     })
     .catch(next);
@@ -70,8 +70,8 @@ module.exports.deleteLike = (req, res, next) => {
         req.params.cardId,
         { $addToSet: { likes: userId } },
         { new: true }
-      ).then(() => {
-        res.send({ message: "Card descurtido com sucesso" });
+      ).then((card) => {
+        res.send(card);
       });
     })
     .catch(next);
