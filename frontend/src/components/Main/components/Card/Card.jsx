@@ -8,6 +8,7 @@ export default function Card(props) {
   const { currentUser } = useContext(CurrentUserContext);
   const { name, link, likes } = props.card;
   const isLiked = likes.some((ownerId) => ownerId === currentUser._id);
+  const showTrashButton = props.card.owner === currentUser._id;
   function handleLikeClick(card) {
     props.onCardLike(card);
   }
@@ -24,12 +25,14 @@ export default function Card(props) {
         alt={name}
         onClick={() => props.onCardClick(props.card)}
       />
-      <img
-        onClick={() => handleOpenPopupConfirmationClick(props.card)}
-        className="photos__delete-icon"
-        src={trashIcon}
-        alt="a trash  icon"
-      />
+      {showTrashButton && (
+        <img
+          onClick={() => handleOpenPopupConfirmationClick(props.card)}
+          className="photos__delete-icon"
+          src={trashIcon}
+          alt="a trash  icon"
+        />
+      )}
       <div className="photos__elements">
         <h2 className="photos__elements-text">{name}</h2>
         <img
