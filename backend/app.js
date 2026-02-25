@@ -18,9 +18,12 @@ const auth = require("./middlewares/auth");
 const app = express();
 
 mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.log("error", err));
+  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/seu-banco")
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err.message);
+    console.error("MONGODB_URI:", process.env.MONGODB_URI);
+  });
 
 const { PORT = 3000 } = process.env;
 
