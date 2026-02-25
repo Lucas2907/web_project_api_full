@@ -19,8 +19,7 @@
 > Este projeto visa simular a interação em um perfil individual dentro de uma rede social chamada Around The U.S, onde cada usuário tem o seu próprio perfil onde pode postar fotos para outros usuários verem.
 <br>
 
-**Visualizar projeto: (https://aroundthelucasworld.chickenkiller.com
-)**
+**Visualizar projeto: (https://web-project-api-full-phi.vercel.app/)**
 
 <br>
 
